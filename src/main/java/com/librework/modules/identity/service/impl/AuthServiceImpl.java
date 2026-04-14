@@ -1,5 +1,6 @@
 package com.librework.modules.identity.service.impl;
 
+import com.librework.common.event.UserRegisteredEvent;
 import com.librework.common.exception.AppException;
 import com.librework.common.exception.ErrorCode;
 import com.librework.modules.identity.dto.request.IntrospectRequest;
@@ -8,11 +9,11 @@ import com.librework.modules.identity.dto.request.UserCreationRequest;
 import com.librework.modules.identity.dto.response.AuthResponse;
 import com.librework.modules.identity.dto.response.IntrospectResponse;
 import com.librework.modules.identity.entity.User;
-import com.librework.modules.identity.entity.UserProfile;
 import com.librework.modules.identity.repository.UserRepository;
 import com.librework.modules.identity.infrastructure.security.JwtService;
 import com.librework.modules.identity.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -49,13 +51,9 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
-        UserProfile profile = UserProfile.builder()
-                .user(user)
-                .build();
-
-        user.setProfile(profile);
-
         User savedUser = userRepository.save(user);
+
+        eventPublisher.publishEvent(new UserRegisteredEvent(savedUser.getId(), savedUser.getEmail()));
 
         return savedUser.getId();
     }

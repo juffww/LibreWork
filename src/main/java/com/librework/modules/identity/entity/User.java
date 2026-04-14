@@ -49,10 +49,6 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Ánh xạ 1-1 với UserProfile
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private UserProfile profile;
-
     public enum UserStatus {
         ACTIVE, SUSPENDED, DEACTIVATED
     }
