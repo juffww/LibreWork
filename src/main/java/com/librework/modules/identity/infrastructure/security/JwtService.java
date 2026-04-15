@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -22,13 +23,14 @@ public class JwtService {
     @Value("${spring.jwt.expiration}")
     private long jwtExpiration;
 
-    public String generateToken(String username) {
+    public String generateToken(String username, UUID userId) {
         try {
             JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject(username)
-                    .issuer("librework")
+                    .claim("userId", userId.toString())
+                    .issuer("LLibrework")
                     .issueTime(new Date())
                     .expirationTime(new Date(System.currentTimeMillis() + jwtExpiration))
                     .build();
