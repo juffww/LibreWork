@@ -1,0 +1,29 @@
+package com.librework.common.security;
+
+import com.librework.common.exception.AppException;
+import com.librework.common.exception.ErrorCode;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+
+public class SecurityUtils {
+    private SecurityUtils() {
+    }
+    // Extract email from jwt token
+    public static String getCurrentUserEmail()
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null || !authentication.isAuthenticated())
+        {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        // princial: Thông tin chính của user 
+        if(authentication.getPrincipal() instanceof Jwt jwt)
+        {
+            return jwt.getSubject();
+        }
+        return authentication.getName();
+    }
+
+}
