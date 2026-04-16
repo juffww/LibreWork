@@ -10,7 +10,7 @@ public class SecurityUtils {
     private SecurityUtils() {
     }
     // Extract email from jwt token
-    public static String getCurrentUserEmail()
+    public static Jwt getCurrentJwt()
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null || !authentication.isAuthenticated())
@@ -21,9 +21,9 @@ public class SecurityUtils {
         // princial: Thông tin chính của user 
         if(authentication.getPrincipal() instanceof Jwt jwt)
         {
-            return jwt.getSubject();
+            return jwt;
         }
-        return authentication.getName();
-    }
 
+        throw new AppException(ErrorCode.UNAUTHENTICATED);
+    }
 }
