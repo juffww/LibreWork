@@ -3,6 +3,7 @@ package com.librework.modules.profiles.repository;
 import com.librework.modules.profiles.entity.ClientProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,4 +11,6 @@ public interface ClientProfileRepository extends JpaRepository<ClientProfile, UU
     Optional<ClientProfile> findByIdAndUserId(UUID id, UUID userId);
 
     boolean existsByUserIdAndCompanyName(UUID userId, String companyName);
+
+    List<ClientProfile> findAllByUserId(UUID userId);
 }

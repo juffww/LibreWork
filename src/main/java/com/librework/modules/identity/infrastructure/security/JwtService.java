@@ -1,5 +1,6 @@
 package com.librework.modules.identity.infrastructure.security;
 
+import com.librework.modules.identity.entity.User;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -27,13 +28,15 @@ public class JwtService {
     @Autowired
     private RedisTokenBlacklistService blacklistService;
 
-    public String generateToken(String username, UUID userId) {
+    public String generateToken(String userName, UUID userId) {
         try {
+
             JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                    .subject(username)
+                    .subject(userName)
                     .claim("userId", userId.toString())
+                    .claim("userName", userName)
                     .issuer("Librework")
                     .issueTime(new Date())
                     .expirationTime(new Date(System.currentTimeMillis() + jwtExpiration))

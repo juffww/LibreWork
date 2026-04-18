@@ -14,6 +14,8 @@ import com.librework.modules.identity.infrastructure.security.RedisTokenBlacklis
 import com.librework.modules.identity.repository.UserRepository;
 import com.librework.modules.identity.infrastructure.security.JwtService;
 import com.librework.modules.identity.service.AuthService;
+import com.librework.modules.profiles.dto.response.UserProfileSummary;
+import com.librework.modules.profiles.service.ProfileQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -38,6 +41,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
     private final RedisTokenBlacklistService redisTokenBlacklistService;
+    private final ProfileQueryService profileQueryService;
 
     @Override
     @Transactional
@@ -77,10 +81,29 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(user.getEmail(), user.getId());
 
+        UserProfileSummary userProfile = profileQueryService.getUserProfiles(user.getId());
+
+        UUID freelancerProfileId = userProfile.getFreelancerProfileId();
+
+        List<AuthResponse.ClientProfileSummary> clientProfiles = userProfile.getClientProfiles()
+                .stream()
+                .map(cp -> AuthResponse.ClientProfileSummary.builder()
+                        .id(cp.getId())
+                        .displayName(cp.getDisplayName())
+                        .avatarUrl(cp.getAvatarUrl())
+                        .build())
+                .toList();;
+
         return AuthResponse.builder()
                 .accessToken(token)
                 .userId(user.getId())
                 .email(user.getEmail())
+                .username(user.getUsername())
+                .fullName(user.getFullName())
+                .avatarUrl(user.getAvatarUrl())
+                .status(user.getStatus())
+                .freelancerProfileId(freelancerProfileId)
+                .clientProfiles(clientProfiles)
                 .build();
     }
 
