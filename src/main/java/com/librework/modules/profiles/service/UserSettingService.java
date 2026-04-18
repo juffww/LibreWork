@@ -12,5 +12,5 @@ public interface UserSettingService {
     UserSetting updateSetting(UserSettingUpdateRequest request);
     ProfileResponse createClientProfile(ClientProfileCreationRequest request);
     UserSetting getUserSetting();
-    ProfileResponse switchActiveContext(ProfileType targetType, UUID targetClientProfileId);
+    ProfileResponse switchAccount(ProfileType targetType, UUID targetClientProfileId);
 }

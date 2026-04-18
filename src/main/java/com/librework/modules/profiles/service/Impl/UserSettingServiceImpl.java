@@ -72,7 +72,7 @@ public class UserSettingServiceImpl implements UserSettingService {
     }
 
     @Transactional
-    public ProfileResponse switchActiveContext(ProfileType targetType, UUID targetClientProfileId)
+    public ProfileResponse switchAccount(ProfileType targetType, UUID targetClientProfileId)
     {
         if (targetType == null) {
             throw new IllegalArgumentException("Target profile type cannot be null");
