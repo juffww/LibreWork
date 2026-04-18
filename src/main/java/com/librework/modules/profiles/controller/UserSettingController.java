@@ -34,6 +34,6 @@ public class UserSettingController {
 
     @PostMapping("/switch-account")
     public ApiResponse<ProfileResponse> switchAccount(@RequestBody SwitchAccountRequest request) {
-        return ApiResponse.ok(userSettingService.switchActiveContext(request.getProfileType(), request.getTargetClientProfileId()));
+        return ApiResponse.ok(userSettingService.switchAccount(request.getProfileType(), request.getTargetClientProfileId()));
     }
 }

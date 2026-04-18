@@ -6,6 +6,7 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ public class JwtService {
     @Value("${spring.jwt.expiration}")
     private long jwtExpiration;
 
+    @Autowired
+    private RedisTokenBlacklistService blacklistService;
+
     public String generateToken(String username, UUID userId) {
         try {
             JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
@@ -30,9 +34,10 @@ public class JwtService {
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject(username)
                     .claim("userId", userId.toString())
-                    .issuer("LLibrework")
+                    .issuer("Librework")
                     .issueTime(new Date())
                     .expirationTime(new Date(System.currentTimeMillis() + jwtExpiration))
+                    .jwtID(UUID.randomUUID().toString())
                     .build();
 
             JWSObject jwsObject = new JWSObject(jwsHeader, new Payload(claimsSet.toJSONObject()));
@@ -48,6 +53,11 @@ public class JwtService {
 
     public boolean isTokenValid(String token) {
         try {
+            String jti = getJwtId(token);
+            if (jti != null && blacklistService.isBlacklisted(jti)) {
+                return false; // Bị ném vào sổ đen -> cấm
+            }
+
             SignedJWT signedJWT = SignedJWT.parse(token);
             boolean signatureValid = signedJWT.verify(new MACVerifier(secretKey.getBytes()));
             Date expiration = signedJWT.getJWTClaimsSet().getExpirationTime();
@@ -55,6 +65,14 @@ public class JwtService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String getJwtId(String token) throws ParseException {
+        return parseClaimsSet(token).getJWTID();
+    }
+
+    public Date getExpirationTime(String token) throws ParseException {
+        return parseClaimsSet(token).getExpirationTime();
     }
 
     private JWTClaimsSet parseClaimsSet(String token) throws ParseException {
