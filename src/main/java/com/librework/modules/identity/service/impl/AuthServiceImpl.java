@@ -84,6 +84,7 @@ public class AuthServiceImpl implements AuthService {
         UserProfileSummary userProfile = profileQueryService.getUserProfiles(user.getId());
 
         UUID freelancerProfileId = userProfile.getFreelancerProfileId();
+        String avatarUrl = userProfile.getFreelancerAvaterUrl();
 
         List<AuthResponse.ClientProfileSummary> clientProfiles = userProfile.getClientProfiles()
                 .stream()
@@ -100,9 +101,9 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .username(user.getUsername())
                 .fullName(user.getFullName())
-                .avatarUrl(user.getAvatarUrl())
                 .status(user.getStatus())
                 .freelancerProfileId(freelancerProfileId)
+                .avatarUrl(avatarUrl)
                 .clientProfiles(clientProfiles)
                 .build();
     }

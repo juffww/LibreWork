@@ -1,0 +1,2 @@
+ALTER TABLE users DROP COLUMN IF EXISTS avatar_url;
+ALTER TABLE freelancer_profiles ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(255);

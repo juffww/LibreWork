@@ -1,12 +1,12 @@
 package com.librework.modules.identity.dto.response;
 
+import com.librework.modules.identity.entity.User;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.librework.modules.identity.entity.User.UserStatus;
 
 @Data
 @Builder
@@ -18,14 +18,9 @@ public class AuthResponse {
 
     @JsonProperty("full_name")
     private String fullName;
-
-    @JsonProperty("avatar_url")
-    private String avatarUrl;
-
-    private UserStatus status;
-
+    private User.UserStatus status;
     private UUID freelancerProfileId;
-
+    private String avatarUrl;
     private List<ClientProfileSummary> clientProfiles;
 
     @Data

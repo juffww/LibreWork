@@ -1,13 +1,14 @@
-
+# config services for app
+# Define containers you want to run
 services:
-  redis:
-    image: redis:alpine
-    container_name: librework-redis
-    ports:
+  redis: # container redis name
+    image: redis:alpine # official image of redis
+    container_name: librework-redis # container name
+    ports: # left: port of computer; right: port of redis container
       - "6379:6379"
-    restart: unless-stopped
-    volumes:
-      - redis_data:/data
+    restart: unless-stopped # restart automatically when crashed or errored
+    volumes: # attach volume for saving redis data
+      - redis_data:/data # /data: redis folder for saving data
 
 volumes:
-  redis_data:
+  redis_data: # actual place for saving data in computer

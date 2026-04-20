@@ -9,6 +9,7 @@ import java.util.UUID;
 @Builder
 public class UserProfileSummary {
     private UUID freelancerProfileId;
+    private String freelancerAvaterUrl;
     private List<ClientProfileInfo> clientProfiles;
 
     @Data

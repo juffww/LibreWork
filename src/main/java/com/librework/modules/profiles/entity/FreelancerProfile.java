@@ -53,7 +53,7 @@ public class FreelancerProfile {
     @Column(name = "overview", columnDefinition = "TEXT")
     private String overview;
 
-    // Xử lý cột kiểu JSONB cho PostgreSQL (Tuyệt chiêu của Hibernate 6)
+    // Xử lý cột kiểu JSONB cho PostgreSQt braL (Tuyệt chiêu của Hibernate 6)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "social_links", columnDefinition = "jsonb")
     private Map<String, String> socialLinks;
@@ -61,6 +61,9 @@ public class FreelancerProfile {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     public enum ExperienceLevel {
         ENTRY,

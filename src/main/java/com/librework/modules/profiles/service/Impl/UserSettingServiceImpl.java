@@ -4,10 +4,14 @@ import com.librework.common.ProfileType;
 import com.librework.common.exception.AppException;
 import com.librework.common.exception.ErrorCode;
 import com.librework.common.security.SecurityUtils;
+import com.librework.modules.identity.entity.User;
 import com.librework.modules.profiles.dto.request.ClientProfileCreationRequest;
 import com.librework.modules.profiles.dto.request.UserSettingUpdateRequest;
+import com.librework.modules.profiles.dto.response.ClientProfileResponse;
+import com.librework.modules.profiles.dto.response.FreelancerReponse;
 import com.librework.modules.profiles.dto.response.ProfileResponse;
 import com.librework.modules.profiles.entity.ClientProfile;
+import com.librework.modules.profiles.entity.FreelancerProfile;
 import com.librework.modules.profiles.entity.UserSetting;
 import com.librework.modules.profiles.mapper.ProfileMapper;
 import com.librework.modules.profiles.mapper.UserSettingMapper;
@@ -47,45 +51,44 @@ public class UserSettingServiceImpl implements UserSettingService {
     }
 
     @Transactional
-    public ProfileResponse createClientProfile(ClientProfileCreationRequest request)
+    public ProfileResponse<ClientProfile> createClientProfile(ClientProfileCreationRequest request)
     {
-        UUID userId = UUID.fromString(SecurityUtils.getCurrentJwt().getClaim("userId"));
+        Jwt jwt = SecurityUtils.getCurrentJwt();
+        UUID userId = UUID.fromString(jwt.getClaim("userId"));
 
-        if (clientProfileRepository.existsByUserIdAndCompanyName(userId, request.getCompanyName())) {
+        if(clientProfileRepository.existsByUserIdAndCompanyName(userId, request.getCompanyName()))
+        {
             throw new AppException(ErrorCode.COMPANY_ALREADY_EXISTS);
         }
 
-        ClientProfile clientProfile = profileMapper.toClientProfile(request);
-        clientProfile.setUserId(userId);
-        clientProfile.setCompanyName(request.getCompanyName());
+        ClientProfile cProfile = ClientProfile.builder()
+                .companyName(request.getCompanyName())
+                .userId(userId)
+                .build();
 
-        ClientProfile savedProfile = clientProfileRepository.save(clientProfile);
-
+        ClientProfile savedCProfile = clientProfileRepository.save(cProfile);
+        // setting
         UserSetting userSetting = userSettingRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.SETTING_NOT_FOUND));
 
         userSetting.setActiveProfileType(ProfileType.CLIENT);
-        userSetting.setActiveClientProfileId(savedProfile.getId());
+        userSetting.setActiveClientProfileId(savedCProfile.getId());
         userSettingRepository.save(userSetting);
 
-        return profileMapper.toProfileResponse(savedProfile);
+        return ProfileResponse.<ClientProfile>builder()
+                .profile(savedCProfile)
+                .profileType(ProfileType.CLIENT)
+                .build();
     }
 
     @Transactional
-    public ProfileResponse switchAccount(ProfileType targetType, UUID targetClientProfileId)
+    public ProfileResponse<?> switchAccount(ProfileType targetType, UUID targetClientProfileId)
     {
-        if (targetType == null) {
-            throw new IllegalArgumentException("Target profile type cannot be null");
-        }
-
         UUID userId = UUID.fromString(SecurityUtils.getCurrentJwt().getClaim("userId"));
 
         UserSetting setting = userSettingRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.SETTING_NOT_FOUND));
 
-        ProfileResponse response;
-
-        // Check switch from Freelancer to Client
         if(targetType == ProfileType.CLIENT)
         {
             if(targetClientProfileId == null)
@@ -94,22 +97,23 @@ public class UserSettingServiceImpl implements UserSettingService {
             }
 
             ClientProfile cProfile = clientProfileRepository.findByIdAndUserId(targetClientProfileId, userId)
-                    .orElseThrow(() -> new AppException(ErrorCode.SETTING_NOT_FOUND));
+                    .orElseThrow(null);
 
-            setting.setActiveClientProfileId(cProfile.getId());
-            response = profileMapper.toProfileResponse(cProfile);
+            setting.setActiveClientProfileId(targetClientProfileId);
+            setting.setActiveProfileType(targetType);
+
+            userSettingRepository.save(setting);
+            return new ProfileResponse<>(ProfileType.CLIENT, cProfile);
         }
-        else {
+        else
+        {
             setting.setActiveClientProfileId(null);
-            com.librework.modules.profiles.entity.FreelancerProfile fProfile = freelancerProfileRepository.findByUserId(userId)
-                    .orElseThrow(() -> new AppException(ErrorCode.SETTING_NOT_FOUND));
-            response = profileMapper.toProfileResponse(fProfile);
+            setting.setActiveProfileType(targetType);
+            FreelancerProfile fProfile = freelancerProfileRepository.findByUserId(userId)
+                    .orElseThrow(null);
+            userSettingRepository.save(setting);
+            return new ProfileResponse<>(ProfileType.FREELANCER, fProfile);
         }
-
-        setting.setActiveProfileType(targetType);
-        userSettingRepository.save(setting);
-
-        return response;
     }
 
     @Override
@@ -119,5 +123,43 @@ public class UserSettingServiceImpl implements UserSettingService {
         return userSettingRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.SETTING_NOT_FOUND));
 
+    }
+
+    @Override
+    public ProfileResponse<?> getCurrentProfile() {
+
+        UUID userId = UUID.fromString(SecurityUtils.getCurrentJwt().getClaim("userId"));
+
+        UserSetting setting = userSettingRepository.findById(userId)
+                .orElseThrow(null);
+
+        switch (setting.getActiveProfileType()) {
+
+            case FREELANCER -> {
+                FreelancerProfile profile = freelancerProfileRepository.findByUserId(userId)
+                        .orElseThrow(null);
+
+                FreelancerReponse response = profileMapper.toFreelancerProfileReponse(profile);
+
+                return ProfileResponse.<FreelancerReponse>builder()
+                        .profileType(ProfileType.FREELANCER)
+                        .profile(response)
+                        .build();
+            }
+
+            case CLIENT -> {
+                ClientProfile profile = clientProfileRepository.findById(
+                        setting.getActiveClientProfileId()
+                ).orElseThrow(null);
+
+                ClientProfileResponse response = profileMapper.toClientProfileResponse(profile);
+
+                return ProfileResponse.<ClientProfileResponse>builder()
+                        .profileType(ProfileType.CLIENT)
+                        .profile(response)
+                        .build();
+            }
+        }
+        return null;
     }
 }

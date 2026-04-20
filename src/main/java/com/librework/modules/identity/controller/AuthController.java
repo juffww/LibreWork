@@ -1,6 +1,7 @@
 package com.librework.modules.identity.controller;
 
 import com.librework.common.response.ApiResponse;
+import com.librework.common.service.CloudinaryService;
 import com.librework.modules.identity.dto.request.IntrospectRequest;
 import com.librework.modules.identity.dto.request.LoginRequest;
 import com.librework.modules.identity.dto.request.LogoutRequest;
@@ -12,6 +13,9 @@ import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 @RestController
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final CloudinaryService cloudinaryService;
     private final AuthService authService;
 
     @PostMapping("/register")
