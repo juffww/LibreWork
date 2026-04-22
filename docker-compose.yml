@@ -1,14 +1,26 @@
-# config services for app
-# Define containers you want to run
 services:
-  redis: # container redis name
-    image: redis:alpine # official image of redis
-    container_name: librework-redis # container name
-    ports: # left: port of computer; right: port of redis container
+  redis:
+    image: redis:alpine
+    container_name: librework-redis
+    ports:
       - "6379:6379"
-    restart: unless-stopped # restart automatically when crashed or errored
-    volumes: # attach volume for saving redis data
-      - redis_data:/data # /data: redis folder for saving data
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+  postgresql:
+    image: postgres:15
+    container_name: librework-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: libreworkdb
+      POSTGRES_USER: librework_user
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  redis_data: # actual place for saving data in computer
+  redis_data:
+  postgres_data:

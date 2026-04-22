@@ -18,13 +18,14 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
-  jwt:
-    secret: fc02e91fe82e6b624fc75502c5cd512d4514d996c43d0ee445a2ce07240f45d6
-    expiration: 3600000
   data:
     redis:
       host: localhost
       port: 6379
+
+jwt:
+  secret: fc02e91fe82e6b624fc75502c5cd512d4514d996c43d0ee445a2ce07240f45d6
+  expiration: 3600000
 
 Cloudinary:
   cloud-name: dig7iy6dw
