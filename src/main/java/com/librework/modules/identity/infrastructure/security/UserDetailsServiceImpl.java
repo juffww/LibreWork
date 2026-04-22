@@ -2,13 +2,14 @@ package com.librework.modules.identity.infrastructure.security;
 
 import com.librework.common.exception.AppException;
 import com.librework.common.exception.ErrorCode;
-import com.librework.modules.identity.entity.User;
-import com.librework.modules.identity.repository.UserRepository;
+import com.librework.modules.identity.domain.entity.User;
+import com.librework.modules.identity.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import com.librework.common.security.CustomUserDetails;
 
 @Service
 @RequiredArgsConstructor

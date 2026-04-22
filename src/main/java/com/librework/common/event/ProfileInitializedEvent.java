@@ -1,11 +1,11 @@
 package com.librework.common.event;
 
 import com.librework.common.enums.ProfileType;
-
 import java.util.UUID;
 
-public record UserRegisteredEvent(
+public record ProfileInitializedEvent(
         UUID userId,
-        String email,
-        ProfileType accountType
+        ProfileType accountType,
+        UUID clientProfileId
 ) {}
+
