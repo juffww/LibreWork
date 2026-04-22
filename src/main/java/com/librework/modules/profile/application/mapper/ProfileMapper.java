@@ -4,7 +4,7 @@ import com.librework.modules.profile.application.dto.request.ClientProfileCreati
 import com.librework.modules.profile.application.dto.request.ClientProfileUpdateRequest;
 import com.librework.modules.profile.application.dto.request.FreelancerProfileUpdateRequest;
 import com.librework.modules.profile.application.dto.response.ClientProfileResponse;
-import com.librework.modules.profile.application.dto.response.FreelancerFileResponse;
+import com.librework.modules.profile.application.dto.response.FreelancerProfileResponse;
 import com.librework.modules.profile.domain.entity.ClientProfile;
 import com.librework.modules.profile.domain.entity.FreelancerProfile;
 import org.mapstruct.*;
@@ -16,7 +16,7 @@ public interface ProfileMapper {
 
     ClientProfileResponse toClientProfileResponse(ClientProfile profile);
 
-    FreelancerFileResponse toFreelancerProfileReponse(FreelancerProfile profile);
+    FreelancerProfileResponse toFreelancerProfileReponse(FreelancerProfile profile);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFreelancerProfile(@MappingTarget FreelancerProfile entity,

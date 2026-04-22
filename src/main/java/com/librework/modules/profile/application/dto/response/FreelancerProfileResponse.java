@@ -10,7 +10,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 @Getter
-public class FreelancerFileResponse {
+public class FreelancerProfileResponse {
     private String title;
     private BigDecimal hourlyRate;
     private FreelancerProfile.ExperienceLevel experienceLevel;

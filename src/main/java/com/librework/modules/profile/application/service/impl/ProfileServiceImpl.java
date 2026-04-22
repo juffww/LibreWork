@@ -6,7 +6,7 @@ import com.librework.common.exception.ErrorCode;
 import com.librework.infrastructure.security.SecurityUtils;
 import com.librework.modules.profile.application.dto.request.ClientProfileCreationRequest;
 import com.librework.modules.profile.application.dto.response.ClientProfileResponse;
-import com.librework.modules.profile.application.dto.response.FreelancerFileResponse;
+import com.librework.modules.profile.application.dto.response.FreelancerProfileResponse;
 import com.librework.modules.profile.application.dto.response.ProfileResponse;
 import com.librework.modules.profile.domain.entity.ClientProfile;
 import com.librework.modules.profile.domain.entity.FreelancerProfile;
@@ -102,9 +102,9 @@ public class ProfileServiceImpl implements ProfileService {
                 FreelancerProfile profile = freelancerProfileRepository.findByUserId(userId)
                         .orElseThrow(() -> new AppException(ErrorCode.SETTING_NOT_FOUND));
 
-                FreelancerFileResponse response = profileMapper.toFreelancerProfileReponse(profile);
+                FreelancerProfileResponse response = profileMapper.toFreelancerProfileReponse(profile);
 
-                return ProfileResponse.<FreelancerFileResponse>builder()
+                return ProfileResponse.<FreelancerProfileResponse>builder()
                         .profileType(ProfileType.FREELANCER)
                         .profile(response)
                         .build();

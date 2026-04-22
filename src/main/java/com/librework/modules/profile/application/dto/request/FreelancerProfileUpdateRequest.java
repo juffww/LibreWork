@@ -20,5 +20,5 @@ public class FreelancerProfileUpdateRequest {
     private FreelancerProfile.Availability availability;
 //    private BigDecimal totalEarned;
     private String overview;
-    private Map<String, String> socialLinks;
+//    private Map<String, String> socialLinks;
 }
