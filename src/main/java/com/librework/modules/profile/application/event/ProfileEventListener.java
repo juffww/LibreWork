@@ -34,19 +34,16 @@ public class ProfileEventListener {
                 .build();
         freelancerProfileRepository.save(freelancerProfile);
 
-        UUID clientProfileId = null;
         if (event.accountType() == ProfileType.CLIENT) {
             ClientProfile clientProfile = ClientProfile.builder()
                     .userId(event.userId())
                     .build();
             ClientProfile savedClientProfile = clientProfileRepository.save(clientProfile);
-            clientProfileId = savedClientProfile.getId();
         }
 
         eventPublisher.publishEvent(new ProfileInitializedEvent(
                 event.userId(),
-                event.accountType() != null ? event.accountType() : ProfileType.FREELANCER,
-                clientProfileId
+                event.accountType() != null ? event.accountType() : ProfileType.FREELANCER
         ));
     }
 }

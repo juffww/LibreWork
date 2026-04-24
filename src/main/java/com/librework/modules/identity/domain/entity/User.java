@@ -1,5 +1,6 @@
 package com.librework.modules.identity.domain.entity;
 
+import com.librework.common.enums.UserStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -55,9 +56,5 @@ public class User {
         }
         this.password = newHashedPassword;
         this.updatedAt = LocalDateTime.now();
-    }
-
-    public enum UserStatus {
-        ACTIVE, SUSPENDED, DEACTIVATED
     }
 }

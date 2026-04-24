@@ -12,5 +12,4 @@ import java.util.UUID;
 @AllArgsConstructor
 public class SwitchAccountRequest {
     private ProfileType targetType;
-    private UUID targetClientProfileId;
 }

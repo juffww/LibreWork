@@ -1,5 +1,6 @@
 package com.librework.modules.identity.infrastructure.entity;
 
+import com.librework.common.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -45,9 +46,5 @@ public class UserJpaEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    public enum UserStatus {
-        ACTIVE, SUSPENDED, DEACTIVATED
-    }
 }
 

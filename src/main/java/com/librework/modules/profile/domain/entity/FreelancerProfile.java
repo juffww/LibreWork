@@ -58,15 +58,30 @@ public class FreelancerProfile {
         }
     }
 
-    public enum ExperienceLevel {
-        ENTRY,
-        INTERMEDIATE,
-        EXPERT
+    public void updateProfileInfo (String title, String overview, BigDecimal hourlyRate,
+                                   ExperienceLevel experienceLevel, Availability availability)
+    {
+        //Check business rule
+        if(hourlyRate != null && hourlyRate.compareTo(BigDecimal.ZERO) < 0)
+        {
+            throw new IllegalArgumentException("Hourly rate cannot be negative");
+        }
+
+        if(title != null) this.title = title;
+        if(overview != null) this.overview = overview;
+        this.hourlyRate = hourlyRate;
+
+        if(experienceLevel != null) this.experienceLevel = experienceLevel;
+        if(availability != null) this.availability = availability;
+
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public enum Availability {
-        FULL_TIME,
-        PART_TIME,
-        NOT_AVAILABLE
+    public void changeAvatar(String newAvatarUrl) {
+        if (newAvatarUrl == null || newAvatarUrl.isBlank()) {
+            throw new IllegalArgumentException("Avatar URL cannot be blank");
+        }
+        this.avatarUrl = newAvatarUrl;
+        this.updatedAt = LocalDateTime.now();
     }
 }

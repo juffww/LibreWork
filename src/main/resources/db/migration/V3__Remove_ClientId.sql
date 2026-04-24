@@ -1,0 +1,1 @@
+alter table user_settings drop column if exists active_client_profile_id

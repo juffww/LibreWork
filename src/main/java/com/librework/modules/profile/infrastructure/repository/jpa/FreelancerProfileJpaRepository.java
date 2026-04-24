@@ -1,6 +1,6 @@
 package com.librework.modules.profile.infrastructure.repository.jpa;
 
-import com.librework.modules.profile.infrastructure.repository.jpa.entity.FreelancerProfileJpaEntity;
+import com.librework.modules.profile.infrastructure.entity.FreelancerProfileJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

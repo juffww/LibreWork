@@ -1,5 +1,6 @@
-package com.librework.infrastructure.config;
+package com.librework.modules.identity.infrastructure.config;
 
+import com.librework.modules.identity.application.port.out.TokenBlacklistPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -31,8 +32,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.librework.infrastructure.security.RedisTokenBlacklistService;
-
 import javax.crypto.spec.SecretKeySpec;
 import java.util.List;
 
@@ -50,7 +49,7 @@ public class SecurityConfig {
     private String secretKey;
 
     private final UserDetailsService userDetailsService;
-    private final RedisTokenBlacklistService redisTokenBlacklistService; // Tiêm Sổ đen vào đây
+    private final TokenBlacklistPort tokenBlacklistPort; // Tiêm Sổ đen vào đây
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -109,7 +108,7 @@ public class SecurityConfig {
         // Validator 2: Kiểm tra sổ đen Redis
         OAuth2TokenValidator<Jwt> customValidator = jwt -> {
             String jti = jwt.getId();
-            if (jti != null && redisTokenBlacklistService.isBlacklisted(jti)) {
+            if (jti != null && tokenBlacklistPort.isBlacklisted(jti)) {
                 return OAuth2TokenValidatorResult.failure(
                         new OAuth2Error("invalid_token", "Token has been revoked", null)
                 );

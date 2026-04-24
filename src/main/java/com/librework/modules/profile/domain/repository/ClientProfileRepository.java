@@ -7,11 +7,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ClientProfileRepository {
+    Optional<ClientProfile> findByUserId(UUID userId);
+
     Optional<ClientProfile> findByIdAndUserId(UUID id, UUID userId);
 
     boolean existsByUserIdAndCompanyName(UUID userId, String companyName);
-
-    List<ClientProfile> findAllByUserId(UUID userId);
 
     ClientProfile save(ClientProfile clientProfile);
 

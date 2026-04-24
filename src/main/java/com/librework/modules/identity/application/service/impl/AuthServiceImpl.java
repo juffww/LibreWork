@@ -9,14 +9,14 @@ import com.librework.modules.identity.application.dto.request.LogoutRequest;
 import com.librework.modules.identity.application.dto.request.UserCreationRequest;
 import com.librework.modules.identity.application.dto.response.AuthResponse;
 import com.librework.modules.identity.application.dto.response.IntrospectResponse;
+import com.librework.modules.identity.application.port.out.TokenBlacklistPort;
+import com.librework.modules.identity.application.port.out.TokenProviderPort;
+import com.librework.modules.identity.application.port.in.AuthUseCase;
 import com.librework.modules.identity.domain.entity.User;
-import com.librework.infrastructure.security.RedisTokenBlacklistService;
+import com.librework.common.enums.UserStatus;
 import com.librework.modules.identity.domain.repository.UserRepository;
-import com.librework.infrastructure.security.JwtService;
-import com.librework.modules.identity.application.service.AuthService;
-import com.librework.modules.profile.application.dto.response.UserProfileSummary;
-import com.librework.modules.profile.application.service.ProfileQueryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,24 +24,26 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl implements AuthUseCase {
 
+    // Dependency vào Repository (Domain)
     private final UserRepository userRepository;
-    private final JwtService jwtService;
+
+    // Dependency vào Spring Security
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
-    private final RedisTokenBlacklistService redisTokenBlacklistService;
-    private final ProfileQueryService profileQueryService;
+
+    // TÍNH CHẤT CLEAN ARCHITECTURE: CHỈ DEPEND VÀO PORT (INTERFACE)
+    private final TokenProviderPort tokenProviderPort;
+    private final TokenBlacklistPort tokenBlacklistPort;
 
     @Override
     @Transactional
@@ -57,12 +59,13 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.getEmail())
                 .username(request.getUserName())
                 .fullName(request.getFullName())
-                .status(User.UserStatus.ACTIVE)
+                .status(UserStatus.ACTIVE)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
         User savedUser = userRepository.save(user);
 
+        // Phát sự kiện để các module khác (ví dụ: Profile) tự lắng nghe và khởi tạo dữ liệu
         eventPublisher.publishEvent(new UserRegisteredEvent(savedUser.getId(), savedUser.getEmail(), request.getAccountType()));
 
         return savedUser.getId();
@@ -70,31 +73,19 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        //- Authentication sẽ gọi UserDetailService để load user và kiểm tra password
-        //- Sau đó so sánh password qua encoder password đã cấu hình trong securityConfig
+        // 1. Xác thực qua Spring Security
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
+        // 2. Lấy thông tin User từ cơ sở dữ liệu
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        String token = jwtService.generateToken(user.getEmail(), user.getId());
+        // 3. Sinh token thông qua Port (Không quan tâm bên dưới dùng JWT hay gì khác)
+        String token = tokenProviderPort.generateToken(user.getUsername(), user.getId());
 
-        UserProfileSummary userProfile = profileQueryService.getUserProfiles(user.getId());
-
-        UUID freelancerProfileId = userProfile.getFreelancerProfileId();
-        String avatarUrl = userProfile.getFreelancerAvaterUrl();
-
-        List<AuthResponse.ClientProfileSummary> clientProfiles = userProfile.getClientProfiles()
-                .stream()
-                .map(cp -> AuthResponse.ClientProfileSummary.builder()
-                        .id(cp.getId())
-                        .displayName(cp.getDisplayName())
-                        .avatarUrl(cp.getAvatarUrl())
-                        .build())
-                .toList();;
-
+        // 4. Trả về thông tin định danh thuần túy
         return AuthResponse.builder()
                 .accessToken(token)
                 .userId(user.getId())
@@ -102,32 +93,31 @@ public class AuthServiceImpl implements AuthService {
                 .username(user.getUsername())
                 .fullName(user.getFullName())
                 .status(user.getStatus())
-                .freelancerProfileId(freelancerProfileId)
-                .avatarUrl(avatarUrl)
-                .clientProfiles(clientProfiles)
                 .build();
     }
 
     @Override
-    public IntrospectResponse introspect(IntrospectRequest request)
-    {
-        boolean valid = jwtService.isTokenValid(request.getToken());
+    public IntrospectResponse introspect(IntrospectRequest request) {
+        // Kiểm tra tính hợp lệ của token qua Port
+        boolean valid = tokenProviderPort.isTokenValid(request.getToken());
         return IntrospectResponse.builder()
                 .valid(valid)
                 .build();
     }
 
     @Override
-    public void logout(LogoutRequest request)
-    {
+    public void logout(LogoutRequest request) {
         try {
             String token = request.getToken();
-            String jti = jwtService.getJwtId(token);
-            Date expirationTime = jwtService.getExpirationTime(token);
+
+            // Lấy JTI và thời gian hết hạn qua Port
+            String jti = tokenProviderPort.getJwtId(token);
+            Date expirationTime = tokenProviderPort.getExpirationTime(token);
             long remainingTime = expirationTime.getTime() - System.currentTimeMillis();
 
+            // Lưu vào Blacklist qua Port (Không cần biết là lưu vào Redis hay DB)
             if (remainingTime > 0) {
-                redisTokenBlacklistService.addToBlacklist(jti, remainingTime);
+                tokenBlacklistPort.addToBlacklist(jti, remainingTime);
             }
         } catch (Exception e) {
             log.error("Lỗi khi xử lý logout token", e);

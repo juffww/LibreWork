@@ -1,29 +1,26 @@
 package com.librework.modules.profile.presentation.controller;
 import com.librework.common.response.ApiResponse;
 import com.librework.modules.profile.application.dto.request.SwitchAccountRequest;
-import com.librework.modules.profile.application.dto.response.ProfileResponse;
-import com.librework.modules.profile.application.service.ProfileService;
+import com.librework.modules.profile.application.dto.response.UserProfileSummary;
+import com.librework.modules.profile.application.port.in.ProfileUseCase;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/me")
 @RequiredArgsConstructor
 public class ProfileController {
-    private final ProfileService profileService;
+
+    private final ProfileUseCase profileUseCase;
+
     @PostMapping("/switch-profile")
-    public ApiResponse<ProfileResponse<?>> switchAccount(
-            @RequestBody SwitchAccountRequest request
-    ) {
-        return ApiResponse.ok(
-                profileService.switchAccount(
-                        request.getTargetType(),
-                        request.getTargetClientProfileId()
-                )
-        );
+    public ApiResponse<UserProfileSummary> switchAccount(@Valid @RequestBody SwitchAccountRequest request) {
+        return ApiResponse.ok(profileUseCase.switchAccount(request.getTargetType()));
     }
-    @GetMapping("")
-    public ApiResponse<?> getProfile()
+
+    @GetMapping
+    public ApiResponse<?> getMe()
     {
-        return ApiResponse.ok(profileService.getCurrentProfile());
+        return ApiResponse.ok(profileUseCase.getMe());
     }
 }
