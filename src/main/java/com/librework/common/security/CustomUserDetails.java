@@ -1,6 +1,7 @@
 package com.librework.common.security;
 
 import com.librework.modules.identity.domain.entity.User;
+import com.librework.common.enums.UserStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,7 +36,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return user.getStatus() != User.UserStatus.SUSPENDED;
+        return user.getStatus() != UserStatus.SUSPENDED;
     }
 
     @Override
@@ -43,6 +44,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.getStatus() == User.UserStatus.ACTIVE;
+        return user.getStatus() == UserStatus.ACTIVE;
     }
 }

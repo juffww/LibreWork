@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public record ProfileInitializedEvent(
         UUID userId,
-        ProfileType accountType,
-        UUID clientProfileId
+        ProfileType accountType
 ) {}
 
