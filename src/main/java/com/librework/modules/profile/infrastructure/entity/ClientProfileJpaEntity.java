@@ -1,4 +1,4 @@
-package com.librework.modules.profile.infrastructure.repository.jpa.entity;
+package com.librework.modules.profile.infrastructure.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,7 +32,7 @@ public class ClientProfileJpaEntity {
     @Column(name = "logo_url", length = 500)
     private String logoUrl;
 
-    @Column(name = "industrty", length = 100)
+    @Column(name = "industry", length = 100)
     private String industry;
 
     @Column(name = "description", columnDefinition = "TEXT")

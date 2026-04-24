@@ -6,6 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 
+import java.util.UUID;
+
 public class SecurityUtils {
     private SecurityUtils() {
     }
@@ -25,5 +27,11 @@ public class SecurityUtils {
         }
 
         throw new AppException(ErrorCode.UNAUTHENTICATED);
+    }
+
+    public static UUID getCurrentUserId()
+    {
+        Jwt jwt = getCurrentJwt();
+        return UUID.fromString(jwt.getClaim("userId"));
     }
 }

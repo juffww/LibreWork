@@ -1,6 +1,7 @@
 package com.librework.modules.profile.application.dto.response;
 
-import com.librework.modules.profile.domain.entity.FreelancerProfile;
+import com.librework.modules.profile.domain.entity.Availability;
+import com.librework.modules.profile.domain.entity.ExperienceLevel;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -13,8 +14,8 @@ import java.util.Map;
 public class FreelancerProfileResponse {
     private String title;
     private BigDecimal hourlyRate;
-    private FreelancerProfile.ExperienceLevel experienceLevel;
-    private FreelancerProfile.Availability availability;
+    private ExperienceLevel experienceLevel;
+    private Availability availability;
     private BigDecimal totalEarned;
     private String overview;
     private Map<String, String> socialLinks;

@@ -1,7 +1,7 @@
-package com.librework.modules.profile.infrastructure.repository.jpa.entity;
+package com.librework.modules.profile.infrastructure.entity;
 
-import com.librework.modules.profile.domain.entity.FreelancerProfile.Availability;
-import com.librework.modules.profile.domain.entity.FreelancerProfile.ExperienceLevel;
+import com.librework.modules.profile.domain.entity.Availability;
+import com.librework.modules.profile.domain.entity.ExperienceLevel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

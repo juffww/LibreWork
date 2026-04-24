@@ -1,23 +1,25 @@
-package com.librework.infrastructure.security;
+package com.librework.modules.identity.infrastructure.security;
 
-import com.librework.modules.identity.domain.entity.User;
+import com.librework.modules.identity.application.port.out.TokenBlacklistPort;
+import com.librework.modules.identity.application.port.out.TokenProviderPort;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.util.Date;
 import java.util.UUID;
 
 @Slf4j
-@Service
-public class JwtService {
+@Component
+@RequiredArgsConstructor
+public class JwtTokenAdapter implements TokenProviderPort {
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -25,19 +27,19 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
-    @Autowired
-    private RedisTokenBlacklistService blacklistService;
+    // Inject Port thay vì Implement cụ thể của Redis
+    private final TokenBlacklistPort blacklistPort;
 
+    @Override
     public String generateToken(String userName, UUID userId) {
         try {
-
             JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject(userName)
                     .claim("userId", userId.toString())
                     .claim("userName", userName)
-                    .issuer("Librework")
+                    .issuer("LibreWork")
                     .issueTime(new Date())
                     .expirationTime(new Date(System.currentTimeMillis() + jwtExpiration))
                     .jwtID(UUID.randomUUID().toString())
@@ -54,28 +56,42 @@ public class JwtService {
         }
     }
 
+    @Override
     public boolean isTokenValid(String token) {
         try {
             String jti = getJwtId(token);
-            if (jti != null && blacklistService.isBlacklisted(jti)) {
-                return false; // Bị ném vào sổ đen -> cấm
+            // Gọi qua Port thay vì class cụ thể
+            if (jti != null && blacklistPort.isBlacklisted(jti)) {
+                return false;
             }
 
             SignedJWT signedJWT = SignedJWT.parse(token);
             boolean signatureValid = signedJWT.verify(new MACVerifier(secretKey.getBytes()));
             Date expiration = signedJWT.getJWTClaimsSet().getExpirationTime();
+
             return signatureValid && expiration != null && expiration.after(new Date());
         } catch (Exception e) {
             return false;
         }
     }
 
-    public String getJwtId(String token) throws ParseException {
-        return parseClaimsSet(token).getJWTID();
+    @Override
+    public String getJwtId(String token) {
+        try {
+            return parseClaimsSet(token).getJWTID();
+        } catch (ParseException e) {
+            // Che giấu ngoại lệ của Nimbus, chỉ ném ra ngoại lệ chung
+            throw new RuntimeException("Invalid token format", e);
+        }
     }
 
-    public Date getExpirationTime(String token) throws ParseException {
-        return parseClaimsSet(token).getExpirationTime();
+    @Override
+    public Date getExpirationTime(String token) {
+        try {
+            return parseClaimsSet(token).getExpirationTime();
+        } catch (ParseException e) {
+            throw new RuntimeException("Invalid token format", e);
+        }
     }
 
     private JWTClaimsSet parseClaimsSet(String token) throws ParseException {
