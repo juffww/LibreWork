@@ -1,4 +1,4 @@
-package com.librework.modules.identity.application.service;
+package com.librework.modules.identity.application.port.in;
 
 import com.librework.modules.identity.application.dto.request.IntrospectRequest;
 import com.librework.modules.identity.application.dto.request.LoginRequest;
@@ -9,7 +9,7 @@ import com.librework.modules.identity.application.dto.response.IntrospectRespons
 
 import java.util.UUID;
 
-public interface AuthService {
+public interface AuthUseCase {
     UUID register(UserCreationRequest request);
     AuthResponse login(LoginRequest request);
     IntrospectResponse introspect (IntrospectRequest request);

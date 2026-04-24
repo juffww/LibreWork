@@ -1,4 +1,4 @@
-package com.librework.modules.identity.infrastructure;
+package com.librework.modules.identity.infrastructure.config;
 
 import com.librework.modules.identity.application.port.out.TokenBlacklistPort;
 import lombok.RequiredArgsConstructor;

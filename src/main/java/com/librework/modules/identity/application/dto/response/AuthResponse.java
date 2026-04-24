@@ -1,5 +1,6 @@
 package com.librework.modules.identity.application.dto.response;
 
+import com.librework.common.enums.UserStatus;
 import com.librework.modules.identity.domain.entity.User;
 import lombok.Builder;
 import lombok.Data;
@@ -18,18 +19,5 @@ public class AuthResponse {
 
     @JsonProperty("full_name")
     private String fullName;
-    private User.UserStatus status;
-    private UUID freelancerProfileId;
-    private String avatarUrl;
-    private List<ClientProfileSummary> clientProfiles;
-
-    @Data
-    @Builder
-    public static class ClientProfileSummary {
-        private UUID id;
-        private String displayName;
-
-        @JsonProperty("avatar_url")
-        private String avatarUrl;
-    }
+    private UserStatus status;
 }

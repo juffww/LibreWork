@@ -21,6 +21,5 @@ public class UserSettingResponse {
     private String country;
     private Language language;
     private ProfileType activeProfileType;
-    private UUID activeClientProfileId;
 }
 

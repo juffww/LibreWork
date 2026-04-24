@@ -12,9 +12,5 @@ import com.librework.modules.identity.application.dto.response.UserSettingRespon
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserSettingMapper {
-    // Bỏ qua các trường null khi mapping
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void toUpdateSetting(@MappingTarget UserSetting setting, UserSettingUpdateRequest request);
-
     UserSettingResponse toResponse(UserSetting setting);
 }

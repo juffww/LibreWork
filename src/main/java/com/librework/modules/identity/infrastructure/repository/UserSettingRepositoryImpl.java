@@ -24,7 +24,6 @@ public class UserSettingRepositoryImpl implements UserSettingRepository {
                 .country(entity.getCountry())
                 .language(entity.getLanguage())
                 .activeProfileType(entity.getActiveProfileType())
-                .activeClientProfileId(entity.getActiveClientProfileId())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
     }
@@ -37,7 +36,6 @@ public class UserSettingRepositoryImpl implements UserSettingRepository {
                 .country(domain.getCountry())
                 .language(domain.getLanguage())
                 .activeProfileType(domain.getActiveProfileType())
-                .activeClientProfileId(domain.getActiveClientProfileId())
                 .updatedAt(domain.getUpdatedAt())
                 .build();
     }

@@ -1,4 +1,4 @@
-package com.librework.infrastructure.security;
+package com.librework.modules.identity.infrastructure.security;
 
 import com.librework.common.exception.AppException;
 import com.librework.common.exception.ErrorCode;

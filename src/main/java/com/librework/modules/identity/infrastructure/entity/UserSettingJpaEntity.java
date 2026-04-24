@@ -42,9 +42,6 @@ public class UserSettingJpaEntity {
     @Column(name = "active_profile_type", nullable = false, length = 20)
     private ProfileType activeProfileType = ProfileType.FREELANCER;
 
-    @Column(name = "active_client_profile_id")
-    private UUID activeClientProfileId;  // NULL khi đang ở FREELANCER context
-
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;

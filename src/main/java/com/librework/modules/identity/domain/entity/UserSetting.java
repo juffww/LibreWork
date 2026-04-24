@@ -2,10 +2,7 @@ package com.librework.modules.identity.domain.entity;
 
 import com.librework.common.enums.ProfileType;
 import com.librework.common.enums.Language;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -30,26 +27,17 @@ public class UserSetting {
     @Builder.Default
     private ProfileType activeProfileType = ProfileType.FREELANCER;
 
-    private UUID activeClientProfileId;
-
     private LocalDateTime updatedAt;
 
-    public void updateLanguageAndCountry(Language language, String country) {
+    public void updateSettings(Language language, String country, String timezone) {
         if (language != null) this.language = language;
         if (country != null) this.country = country;
+        if (timezone != null) this.timezone = timezone;
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void switchProfile(ProfileType type, UUID clientProfileId) {
-        if (type == ProfileType.CLIENT && clientProfileId == null) {
-            throw new IllegalArgumentException("Khởi tạo Client profile cần có Profile ID hợp lệ");
-        }
+    public void switchProfile(ProfileType type) {
         this.activeProfileType = type;
-        if (type == ProfileType.CLIENT) {
-            this.activeClientProfileId = clientProfileId;
-        } else {
-            this.activeClientProfileId = null;
-        }
         this.updatedAt = LocalDateTime.now();
     }
 

@@ -1,21 +1,16 @@
 package com.librework.modules.identity.presentation.controller;
 
 import com.librework.common.response.ApiResponse;
-import com.librework.infrastructure.storage.CloudinaryService;
 import com.librework.modules.identity.application.dto.request.IntrospectRequest;
 import com.librework.modules.identity.application.dto.request.LoginRequest;
 import com.librework.modules.identity.application.dto.request.LogoutRequest;
 import com.librework.modules.identity.application.dto.request.UserCreationRequest;
 import com.librework.modules.identity.application.dto.response.AuthResponse;
 import com.librework.modules.identity.application.dto.response.IntrospectResponse;
-import com.librework.modules.identity.application.service.AuthService;
+import com.librework.modules.identity.application.port.in.AuthUseCase;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 
 @RestController
@@ -23,30 +18,29 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final CloudinaryService cloudinaryService;
-    private final AuthService authService;
+    private final AuthUseCase authUseCase;
 
     @PostMapping("/register")
     public ApiResponse<?> register(@Valid @RequestBody UserCreationRequest request) {
-            return ApiResponse.ok(authService.register(request));
+            return ApiResponse.ok(authUseCase.register(request));
     }
 
     @PostMapping("/login")
     public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request)
     {
-        return ApiResponse.ok(authService.login(request));
+        return ApiResponse.ok(authUseCase.login(request));
     }
 
     @PostMapping("/introspect")
     public ApiResponse<IntrospectResponse> introspect (@RequestBody IntrospectRequest request)
     {
-        return ApiResponse.ok(authService.introspect(request));
+        return ApiResponse.ok(authUseCase.introspect(request));
     }
 
     @PostMapping("/logout")
     public ApiResponse<?> logout(@RequestBody LogoutRequest request)
     {
-        authService.logout(request);
+        authUseCase.logout(request);
         return ApiResponse.ok(null);
     }
 }
