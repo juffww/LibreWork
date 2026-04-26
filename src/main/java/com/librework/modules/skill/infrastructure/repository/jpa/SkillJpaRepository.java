@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface SkillJpaRepository extends JpaRepository<SkillJpaEntity, UUID> {
     List<SkillJpaEntity> findAllByCategoryId(UUID categoryId);
+    List<SkillJpaEntity> findAllByIdIn(List<UUID> ids);
 }
