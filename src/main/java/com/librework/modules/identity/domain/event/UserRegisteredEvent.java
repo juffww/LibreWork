@@ -1,4 +1,4 @@
-package com.librework.common.event;
+package com.librework.modules.identity.domain.event;
 
 import com.librework.common.enums.ProfileType;
 

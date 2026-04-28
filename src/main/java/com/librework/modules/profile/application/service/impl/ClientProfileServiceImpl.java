@@ -1,6 +1,5 @@
 package com.librework.modules.profile.application.service.impl;
 
-import com.librework.common.enums.ProfileType;
 import com.librework.common.exception.AppException;
 import com.librework.common.exception.ErrorCode;
 import com.librework.common.port.CurrentUserPort;
@@ -11,7 +10,6 @@ import com.librework.modules.profile.application.port.in.ClientProfileUseCase;
 import com.librework.modules.profile.domain.entity.ClientProfile;
 import com.librework.modules.profile.domain.repository.ClientProfileRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

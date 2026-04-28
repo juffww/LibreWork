@@ -1,6 +1,6 @@
 package com.librework.modules.identity.application.service.impl;
 
-import com.librework.common.event.UserRegisteredEvent;
+import com.librework.modules.identity.domain.event.UserRegisteredEvent;
 import com.librework.common.exception.AppException;
 import com.librework.common.exception.ErrorCode;
 import com.librework.modules.identity.application.dto.request.IntrospectRequest;
