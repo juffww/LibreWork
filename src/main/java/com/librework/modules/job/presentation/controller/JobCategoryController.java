@@ -11,6 +11,9 @@ import com.librework.modules.job.application.dto.response.ProposalResponse;
 import com.librework.modules.job.application.port.in.JobCategoryUseCase;
 import com.librework.modules.job.application.port.in.JobUseCase;
 import com.librework.modules.job.application.port.in.ProposalUseCase;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,39 +24,48 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/job-categories")
 @RequiredArgsConstructor
+@Tag(name = "Job Categories", description = "Job category management")
 public class JobCategoryController {
     private final JobCategoryUseCase jobCategoryUseCase;
 
     @GetMapping
+    @Operation(summary = "Get root categories", description = "Get list of top-level categories")
     public ApiResponse<List<JobCategoryResponse>> getRoots() {
         return ApiResponse.ok(jobCategoryUseCase.getRoots());
     }
 
     @GetMapping("/{id}/children")
+    @Operation(summary = "Get child categories", description = "Get list of child categories by parent ID")
     public ApiResponse<List<JobCategoryResponse>> getChildren(@PathVariable UUID id) {
         return ApiResponse.ok(jobCategoryUseCase.getChildren(id));
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Category details")
     public ApiResponse<JobCategoryResponse> getById(@PathVariable UUID id) {
         return ApiResponse.ok(jobCategoryUseCase.getById(id));
     }
 
     @PostMapping           // ADMIN
+    @Operation(summary = "Create category", description = "Create a category (Requires ADMIN role)")
+    @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<JobCategoryResponse> create(@RequestBody @Valid JobCategoryRequest request) {
         return ApiResponse.ok(jobCategoryUseCase.create(request));
     }
 
     @PutMapping("/{id}")   // ADMIN
+    @Operation(summary = "Update category", description = "Update category info (Requires ADMIN role)")
+    @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<JobCategoryResponse> update(@PathVariable UUID id,
                                                    @RequestBody @Valid JobCategoryRequest request) {
         return ApiResponse.ok(jobCategoryUseCase.update(id, request));
     }
 
     @DeleteMapping("/{id}") // ADMIN
+    @Operation(summary = "Delete category", description = "Delete a category by ID (Requires ADMIN role)")
+    @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<Void> delete(@PathVariable UUID id) {
         jobCategoryUseCase.delete(id);
         return ApiResponse.ok(null);
     }
 }
-

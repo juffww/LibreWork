@@ -27,7 +27,20 @@ jwt:
   secret: fc02e91fe82e6b624fc75502c5cd512d4514d996c43d0ee445a2ce07240f45d6
   expiration: 3600000
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui
+    try-it-out-enabled: true #enable test API directly on UI
+    operations-sorter: method # sort for method
+    tags-sorter: alpha
+    display-request-duration: true # show the response time
+  packages-to-scan: com.librework # scan all project
+  show-actuator: false
+
 Cloudinary:
   cloud-name: dig7iy6dw
   api-key: 623444961351143
   api-secret: -MMWRwVYmHr8o_N98aWVaPS-GVw
+
