@@ -3,6 +3,8 @@ package com.librework.modules.skill.presentation.controller;
 import com.librework.common.response.ApiResponse;
 import com.librework.modules.skill.application.dto.response.SkillCategoryResponse;
 import com.librework.modules.skill.application.port.in.SkillCategoryUseCase;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,15 +17,18 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/skill-categories")
 @RequiredArgsConstructor
+@Tag(name = "Skill Categories", description = "Skill Category Management")
 public class SkillCategoryController {
     private final SkillCategoryUseCase skillCategoryUseCase;
 
     @GetMapping
+    @Operation(summary = "Get all skill categories")
     public ApiResponse<List<SkillCategoryResponse>> getAll() {
         return ApiResponse.ok(skillCategoryUseCase.getAll());
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get details of a skill category")
     public ApiResponse<SkillCategoryResponse> getById(@PathVariable UUID id)
     {
         return ApiResponse.ok(skillCategoryUseCase.getById(id));

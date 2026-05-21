@@ -42,21 +42,25 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/v1/auth/**",
-            "/error"
+            "/error",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml"
     };
 
     @Value("${jwt.secret}")
     private String secretKey;
 
     private final UserDetailsService userDetailsService;
-    private final TokenBlacklistPort tokenBlacklistPort; // Tiêm Sổ đen vào đây
+    private final TokenBlacklistPort tokenBlacklistPort; //
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated()
                 )
                 // Cấu hình không lưu session (Stateless) vì ta dùng JWT
