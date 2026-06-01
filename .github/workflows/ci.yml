@@ -39,4 +39,4 @@ jobs:
           cache: maven
 
       - name: Build and test with Maven
-        run: mvn -B clean verify
+        run: mvn -B clean verify -e
