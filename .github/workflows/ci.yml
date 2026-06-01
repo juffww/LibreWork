@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      posgres:
+      postgres:
         image: posgres:15
         env:
           POSTGRES_DB: libreworkdb
