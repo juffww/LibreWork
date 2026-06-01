@@ -12,7 +12,7 @@ jobs:
 
     services:
       postgres:
-        image: posgres:15
+        image: postgres:15
         env:
           POSTGRES_DB: libreworkdb
           POSTGRES_USER: librework_user
