@@ -2,8 +2,8 @@ package com.librework.infrastructure.storage;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.librework.common.exception.AppException;
-import com.librework.common.exception.ErrorCode;
+import com.librework.exception.AppException;
+import com.librework.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
