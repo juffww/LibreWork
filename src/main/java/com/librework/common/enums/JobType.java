@@ -2,5 +2,9 @@ package com.librework.common.enums;
 
 public enum JobType {
     FIXED,
-    HOURLY
+    HOURLY,
+    CONTRACT,
+    FULL_TIME,
+    PART_TIME,
+    FREELANCE
 }
