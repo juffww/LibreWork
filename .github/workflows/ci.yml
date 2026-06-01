@@ -17,7 +17,7 @@ jobs:
           POSTGRES_DB: libreworkdb
           POSTGRES_USER: librework_user
           POSTGRES_PASSWORD: 123456
-        port:
+        ports:
           - 5432:5432
         volumes:
           - postgres_data:/var/lib/postgresql/data
