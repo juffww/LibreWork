@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE public.client_profiles (
+CREATE TABLE IF NOT EXISTS public.client_profiles (
     id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
     user_id uuid NOT NULL,
     company_name character varying(200),
@@ -26,7 +26,7 @@ CREATE TABLE public.client_profiles (
     FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE public.freelancer_profiles (
+CREATE TABLE IF NOT EXISTS public.freelancer_profiles (
     id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
     user_id uuid NOT NULL UNIQUE,
     title character varying(200),
@@ -41,7 +41,7 @@ CREATE TABLE public.freelancer_profiles (
     FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE public.user_settings (
+CREATE TABLE IF NOT EXISTS public.user_settings (
     user_id uuid NOT NULL PRIMARY KEY,
     active_client_profile_id uuid,
     country character varying(100),
@@ -52,7 +52,7 @@ CREATE TABLE public.user_settings (
     FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE public.user_oauth_providers (
+CREATE TABLE IF NOT EXISTS public.user_oauth_providers (
     id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
     user_id uuid NOT NULL,
     provider character varying(20) NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE public.user_oauth_providers (
     FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE public.skill_categories (
+CREATE TABLE IF NOT EXISTS public.skill_categories (
     id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
     name character varying(255) NOT NULL,
     slug character varying(255) NOT NULL UNIQUE,
@@ -75,7 +75,7 @@ CREATE TABLE public.skill_categories (
     created_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE public.skills (
+CREATE TABLE IF NOT EXISTS public.skills (
     id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
     category_id uuid,
     name character varying(255) NOT NULL UNIQUE,
@@ -85,7 +85,7 @@ CREATE TABLE public.skills (
     FOREIGN KEY (category_id) REFERENCES public.skill_categories(id) ON DELETE SET NULL
 );
 
-CREATE TABLE public.user_skills (
+CREATE TABLE IF NOT EXISTS public.user_skills (
     user_id uuid NOT NULL,
     skill_id uuid NOT NULL,
     proficiency_level character varying(255) DEFAULT 'INTERMEDIATE' NOT NULL,
@@ -96,7 +96,7 @@ CREATE TABLE public.user_skills (
     FOREIGN KEY (skill_id) REFERENCES public.skills(id) ON DELETE CASCADE
 );
 
-CREATE TABLE public.job_categories (
+CREATE TABLE IF NOT EXISTS public.job_categories (
     id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
     parent_id uuid,
     name character varying(100) NOT NULL,
@@ -108,7 +108,7 @@ CREATE TABLE public.job_categories (
     FOREIGN KEY (parent_id) REFERENCES public.job_categories(id) ON DELETE SET NULL
 );
 
-CREATE TABLE public.jobs (
+CREATE TABLE IF NOT EXISTS public.jobs (
     id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
     client_id uuid NOT NULL,
     category_id uuid,
@@ -129,7 +129,7 @@ CREATE TABLE public.jobs (
     FOREIGN KEY (client_id) REFERENCES public.client_profiles(id) ON DELETE RESTRICT
 );
 
-CREATE TABLE public.job_skills (
+CREATE TABLE IF NOT EXISTS public.job_skills (
     job_id uuid NOT NULL,
     skill_id uuid NOT NULL,
     is_required boolean DEFAULT true NOT NULL,
@@ -138,7 +138,7 @@ CREATE TABLE public.job_skills (
     FOREIGN KEY (skill_id) REFERENCES public.skills(id) ON DELETE CASCADE
 );
 
-CREATE TABLE public.proposals (
+CREATE TABLE IF NOT EXISTS public.proposals (
     id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
     job_id uuid NOT NULL,
     freelancer_id uuid NOT NULL,
@@ -156,16 +156,15 @@ CREATE TABLE public.proposals (
     FOREIGN KEY (job_id) REFERENCES public.jobs(id) ON DELETE RESTRICT
 );
 
-CREATE INDEX idx_client_profiles_user_id ON public.client_profiles USING btree (user_id);
-CREATE INDEX idx_job_skills_skill_id ON public.job_skills USING btree (skill_id);
-CREATE INDEX idx_jobs_category_id ON public.jobs USING btree (category_id);
-CREATE INDEX idx_jobs_client_id ON public.jobs USING btree (client_id);
-CREATE INDEX idx_jobs_status_created_at ON public.jobs USING btree (status, created_at DESC);
-CREATE INDEX idx_proposals_freelancer_id ON public.proposals USING btree (freelancer_id);
-CREATE INDEX idx_proposals_job_id ON public.proposals USING btree (job_id);
-CREATE INDEX idx_proposals_status ON public.proposals USING btree (status);
-CREATE INDEX idx_skills_category_id ON public.skills USING btree (category_id);
-CREATE INDEX idx_user_oauth_providers_user_id ON public.user_oauth_providers USING btree (user_id);
-CREATE INDEX idx_users_status ON public.users USING btree (status);
-
+CREATE INDEX IF NOT EXISTS idx_client_profiles_user_id ON public.client_profiles USING btree (user_id);
+CREATE INDEX IF NOT EXISTS idx_job_skills_skill_id ON public.job_skills USING btree (skill_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_category_id ON public.jobs USING btree (category_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_client_id ON public.jobs USING btree (client_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_status_created_at ON public.jobs USING btree (status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_proposals_freelancer_id ON public.proposals USING btree (freelancer_id);
+CREATE INDEX IF NOT EXISTS idx_proposals_job_id ON public.proposals USING btree (job_id);
+CREATE INDEX IF NOT EXISTS idx_proposals_status ON public.proposals USING btree (status);
+CREATE INDEX IF NOT EXISTS idx_skills_category_id ON public.skills USING btree (category_id);
+CREATE INDEX IF NOT EXISTS idx_user_oauth_providers_user_id ON public.user_oauth_providers USING btree (user_id);
+CREATE INDEX IF NOT EXISTS idx_users_status ON public.users USING btree (status);
 
