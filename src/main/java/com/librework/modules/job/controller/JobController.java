@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class JobController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @Operation(summary = "Create new job", description = "Client creates a new job")
     @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<JobDetailResponse> create(@RequestBody @Valid JobCreationRequest request) {

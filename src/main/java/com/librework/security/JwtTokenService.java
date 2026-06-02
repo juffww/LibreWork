@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -34,21 +35,17 @@ public class JwtTokenService implements TokenProviderService {
     private final TokenBlacklistService tokenBlacklistService;
 
     @Override
-    public String generateToken(String userName, UUID userId) {
-        return generateToken(userName, userId, null);
-    }
-
-    @Override
-    public String generateToken(String userName, UUID userId, ProfileType activeProfileType) {
-        return generateToken(userName, userId, jwtExpiration, "access", activeProfileType);
+    public String generateToken(String userName, UUID userId, ProfileType activeProfileType, List<String> roles) {
+        return generateToken(userName, userId, jwtExpiration, "access", activeProfileType, roles);
     }
 
     @Override
     public String generateRefreshToken(String userName, UUID userId) {
-        return generateToken(userName, userId, refreshExpiration, "refresh", null);
+        return generateToken(userName, userId, refreshExpiration, "refresh", null, List.of());
     }
 
-    private String generateToken(String userName, UUID userId, long expirationMillis, String tokenType, ProfileType activeProfileType) {
+    private String generateToken(String userName, UUID userId, long expirationMillis, String tokenType, ProfileType activeProfileType,
+                                 List<String> roles) {
         try {
             JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
@@ -57,7 +54,7 @@ public class JwtTokenService implements TokenProviderService {
                     .claim("userId", userId.toString())
                     .claim("userName", userName)
                     .claim("type", tokenType)
-                    .claim("roles", java.util.List.of("USER"))
+                    .claim("roles", roles)
                     .issuer("LibreWork")
                     .issueTime(new Date())
                     .expirationTime(new Date(System.currentTimeMillis() + expirationMillis))

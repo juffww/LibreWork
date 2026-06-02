@@ -1,5 +1,6 @@
 package com.librework.modules.identity.entity;
 
+import com.librework.common.enums.RoleName;
 import com.librework.common.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,6 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -46,6 +49,15 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    @Builder.Default
+    private Set<Role> roles = new HashSet<>();
 
     public void suspend() {
         if (this.status == UserStatus.DEACTIVATED) {

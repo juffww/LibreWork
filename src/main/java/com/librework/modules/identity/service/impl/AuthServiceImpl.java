@@ -1,5 +1,8 @@
 package com.librework.modules.identity.service.impl;
 
+import com.librework.common.enums.RoleName;
+import com.librework.modules.identity.entity.Role;
+import com.librework.modules.identity.repository.RoleRepository;
 import com.librework.modules.identity.service.AuthService;
 import com.librework.modules.identity.service.UserSettingService;
 
@@ -31,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.time.Duration;
 
@@ -40,6 +44,7 @@ import java.time.Duration;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
@@ -68,6 +73,9 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
+        Role userRole = roleRepository.findByName(RoleName.USER)
+                .orElseThrow(() -> new RuntimeException());
+        user.getRoles().add(userRole);
         User savedUser = userRepository.save(user);
 
         profileInitializationService.initializeForNewUser(savedUser.getId(), request.getAccountType());
@@ -92,10 +100,15 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
+        List<String> roles = user.getRoles().stream()
+                .map(role -> role.getName().name())
+                .toList();
+
         String token = tokenProviderService.generateToken(
                 user.getUsername(),
                 user.getId(),
-                activeProfileService.getActiveProfileType(user.getId())
+                activeProfileService.getActiveProfileType(user.getId()),
+                roles
         );
         String refreshToken = tokenProviderService.generateRefreshToken(user.getUsername(), user.getId());
         rememberRefreshToken(user.getId(), refreshToken);
@@ -123,18 +136,23 @@ public class AuthServiceImpl implements AuthService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findWithRolesById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         if (user.getStatus() != UserStatus.ACTIVE) {
             refreshTokenStoreService.revoke(userId);
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
+        List<String> roles = user.getRoles().stream()
+                        .map(role -> role.getName().name())
+                        .toList();
+
         blacklistIfStillAlive(refreshToken);
         String accessToken = tokenProviderService.generateToken(
                 user.getUsername(),
                 user.getId(),
-                activeProfileService.getActiveProfileType(user.getId())
+                activeProfileService.getActiveProfileType(user.getId()),
+                roles
         );
         String newRefreshToken = tokenProviderService.generateRefreshToken(user.getUsername(), user.getId());
         rememberRefreshToken(user.getId(), newRefreshToken);

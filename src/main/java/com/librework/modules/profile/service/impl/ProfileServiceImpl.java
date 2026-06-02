@@ -1,5 +1,7 @@
 package com.librework.modules.profile.service.impl;
 
+import com.librework.modules.identity.entity.User;
+import com.librework.modules.identity.repository.UserRepository;
 import com.librework.modules.profile.service.ProfileService;
 
 
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,6 +29,7 @@ import java.util.UUID;
 public class ProfileServiceImpl implements ProfileService {
 
     private final ClientProfileRepository clientProfileRepository;
+    private final UserRepository userRepository;
     private final FreelancerProfileRepository freelancerProfileRepository;
     private final ActiveProfileService activeProfileService;
     private final CurrentUserService currentUserService;
@@ -44,11 +48,20 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
         activeProfileService.setActiveProfile(userId, targetType);
+
+        User user = userRepository.findWithRolesById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        List<String> roles = user.getRoles().stream()
+                .map(role -> role.getName().name())
+                .toList();
+
         UserProfileSummary summary = getMe();
         summary.setAccessToken(tokenProviderService.generateToken(
                 currentUserService.getCurrentUserName(),
                 userId,
-                targetType
+                targetType,
+                roles
         ));
         return summary;
     }
