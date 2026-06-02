@@ -3,11 +3,11 @@ package com.librework.modules.identity.service;
 import com.librework.common.enums.ProfileType;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public interface TokenProviderService {
-    String generateToken(String userName, UUID userId);
-    String generateToken(String userName, UUID userId, ProfileType activeProfileType);
+    String generateToken(String userName, UUID userId, ProfileType activeProfileType, List<String> roles);
     String generateRefreshToken(String userName, UUID userId);
     boolean isTokenValid(String token);
     boolean isRefreshTokenValid(String token);

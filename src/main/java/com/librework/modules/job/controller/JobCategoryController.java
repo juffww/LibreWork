@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class JobCategoryController {
     }
 
     @PostMapping           // ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create category", description = "Create a category (Requires ADMIN role)")
     @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<JobCategoryResponse> create(@RequestBody @Valid JobCategoryRequest request) {
@@ -54,6 +56,7 @@ public class JobCategoryController {
     }
 
     @PutMapping("/{id}")   // ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update category", description = "Update category info (Requires ADMIN role)")
     @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<JobCategoryResponse> update(@PathVariable UUID id,
@@ -62,6 +65,7 @@ public class JobCategoryController {
     }
 
     @DeleteMapping("/{id}") // ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete category", description = "Delete a category by ID (Requires ADMIN role)")
     @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<Void> delete(@PathVariable UUID id) {
