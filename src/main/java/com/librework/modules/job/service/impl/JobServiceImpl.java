@@ -1,13 +1,13 @@
 package com.librework.modules.job.service.impl;
 
+import com.librework.common.enums.*;
+import com.librework.common.response.PageResponse;
 import com.librework.modules.job.service.JobService;
 
 
 
 import com.librework.exception.AppException;
 import com.librework.exception.ErrorCode;
-import com.librework.common.enums.JobStatus;
-import com.librework.common.enums.ProfileType;
 import com.librework.modules.identity.service.ActiveProfileService;
 import com.librework.modules.profile.service.ProfileLookupService;
 import com.librework.modules.identity.service.CurrentUserService;
@@ -24,6 +24,10 @@ import com.librework.modules.job.entity.JobSkill;
 import com.librework.modules.job.repository.JobRepository;
 import com.librework.modules.job.repository.JobSkillRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -120,6 +124,27 @@ public class JobServiceImpl implements JobService {
 
         job.close();
         jobRepository.save(job);
+    }
+
+    @Override
+    public PageResponse<JobSummaryResponse> searchOpenJobs(String keyword, UUID categoryId, ExperienceLevel experienceLevel, BudgetType budgetType, JobDuration duration, int page, int size) {
+        int safePage = Math.max(page, 0);
+        int safeSize = size <= 0 ? 10 : Math.min(size, 50);
+        String keywordPattern = keyword == null || keyword.isBlank()
+                ? ""
+                : "%" + keyword.trim().toLowerCase() + "%";
+
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<JobSummaryResponse> jobs = jobRepository.searchOpenJobs(
+                keywordPattern,
+                categoryId,
+                experienceLevel,
+                budgetType,
+                duration,
+                pageable
+        ).map(mapper::toSummaryResponse);
+
+        return PageResponse.from(jobs);
     }
 
     // --- helper ---
