@@ -22,9 +22,6 @@ public class JobCreationRequest {
     private String description;
 
     @NotNull
-    private JobType jobType;
-
-    @NotNull
     private BudgetType budgetType;
 
     private BigDecimal budgetFixed;
@@ -44,6 +41,8 @@ public class JobCreationRequest {
     private int freelancersNeeded = 1;
 
     private UUID subcategoryId;
+
+    private String currency;
 
     // danh sách skill yêu cầu
     private List<JobSkillRequest> skills;

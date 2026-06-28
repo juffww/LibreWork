@@ -1,6 +1,10 @@
 package com.librework.modules.job.controller;
 
+import com.librework.common.enums.BudgetType;
+import com.librework.common.enums.ExperienceLevel;
+import com.librework.common.enums.JobDuration;
 import com.librework.common.response.ApiResponse;
+import com.librework.common.response.PageResponse;
 import com.librework.modules.job.dto.request.JobCreationRequest;
 import com.librework.modules.job.dto.response.JobDetailResponse;
 import com.librework.modules.job.dto.response.JobSummaryResponse;
@@ -23,10 +27,26 @@ import java.util.UUID;
 public class JobController {
     private final JobService jobService;
 
+//    @GetMapping
+//    @Operation(summary = "Get list of open jobs", description = "Display open jobs for freelancers")
+//    public ApiResponse<List<JobSummaryResponse>> getOpenJobs() {
+//        return ApiResponse.ok(jobService.getOpenJobs());
+//    }
+
     @GetMapping
-    @Operation(summary = "Get list of open jobs", description = "Display open jobs for freelancers")
-    public ApiResponse<List<JobSummaryResponse>> getOpenJobs() {
-        return ApiResponse.ok(jobService.getOpenJobs());
+    @Operation(summary = "Get page list of open jobs", description = "Display open jobs for freelancer")
+    public ApiResponse<PageResponse<JobSummaryResponse>> getOpenJobs(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) UUID categoryId,
+            @RequestParam(required = false) ExperienceLevel level,
+            @RequestParam(required = false)BudgetType budgetType,
+            @RequestParam(required = false)JobDuration duration,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+            )
+    {
+        return ApiResponse.ok(jobService.searchOpenJobs(keyword, categoryId, level, budgetType, duration, page
+        , size));
     }
 
     @GetMapping("/me")
@@ -43,7 +63,7 @@ public class JobController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Create new job", description = "Client creates a new job")
     @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<JobDetailResponse> create(@RequestBody @Valid JobCreationRequest request) {

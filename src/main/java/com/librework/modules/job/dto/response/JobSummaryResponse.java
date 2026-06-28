@@ -5,6 +5,7 @@ import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -12,11 +13,13 @@ public record JobSummaryResponse(
         UUID id,
         UUID clientId,
         String title,
-        JobType jobType,
+        String description,
+        UUID categoryId,
         BudgetType budgetType,
         BigDecimal budgetFixed,
         BigDecimal budgetMin,
         BigDecimal budgetMax,
+        String currency,
         JobDuration duration,
         ExperienceLevel experienceLevel,
         JobStatus status,
@@ -25,5 +28,6 @@ public record JobSummaryResponse(
         boolean isUrgent,
         int freelancersNeeded,
         UUID subcategoryId,
+        List<JobSkillResponse> skills,
         LocalDateTime createdAt
 ) {}

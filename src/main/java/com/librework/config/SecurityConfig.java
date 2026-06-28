@@ -75,8 +75,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET,
-//                                "/api/v1/jobs",
-//                                "/api/v1/jobs/*",
+                                "/api/v1/jobs",
+                                "/api/v1/jobs/*",
                                 "/api/v1/job-categories/**",
                                 "/api/v1/skills/**",
                                 "/api/v1/skill-categories/**",
