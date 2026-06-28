@@ -63,7 +63,7 @@ public class JobController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Create new job", description = "Client creates a new job")
     @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<JobDetailResponse> create(@RequestBody @Valid JobCreationRequest request) {

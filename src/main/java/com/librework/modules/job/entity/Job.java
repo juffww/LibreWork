@@ -35,10 +35,6 @@ public class Job {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "job_type", nullable = false, length = 20)
-    private JobType jobType;
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "budget_type", nullable = false, length = 10)
     private BudgetType budgetType;
 
@@ -72,6 +68,9 @@ public class Job {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "currency")
+    private String currency;
+
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -94,8 +93,8 @@ public class Job {
 
     public static Job create(
             UUID clientId, UUID categoryId, String title, String description,
-            JobType jobType, BudgetType budgetType, BigDecimal budgetFixed,
-            BigDecimal budgetMin, BigDecimal budgetMax, JobDuration duration,
+            BudgetType budgetType, BigDecimal budgetFixed,
+            BigDecimal budgetMin, BigDecimal budgetMax, String currency, JobDuration duration,
             ExperienceLevel experienceLevel, JobVisibility visibility,
             boolean isUrgent, int freelancersNeeded, UUID subcategoryId
     ) {
@@ -105,11 +104,11 @@ public class Job {
                 .categoryId(categoryId)
                 .title(title)
                 .description(description)
-                .jobType(jobType)
                 .budgetType(budgetType)
                 .budgetFixed(budgetFixed)
                 .budgetMin(budgetMin)
                 .budgetMax(budgetMax)
+                .currency(currency)
                 .duration(duration)
                 .experienceLevel(experienceLevel)
                 .status(JobStatus.OPEN)
